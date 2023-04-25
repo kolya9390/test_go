@@ -5,6 +5,19 @@ import (
 	"strconv"
 )
 
+var romanNumerals = map[string]int{
+	"I": 1,
+	"II": 2,
+	"III": 3,
+	"IV": 4,
+	"V": 5,
+	"VI": 6,
+	"VII": 7,
+	"VIII": 8,
+	"IX": 9,
+	"X": 10,
+}
+
 func add(a, b int) int {
 	return a + b
 }
@@ -28,8 +41,6 @@ func romanToArabic(romanNumeral string) (int, error) {
 		'X': 10,
 		'L': 50,
 		'C': 100,
-		'D': 500,
-		'M': 1000,
 	}
 
 	var result int
@@ -48,18 +59,11 @@ func romanToArabic(romanNumeral string) (int, error) {
 }
 
 func arabicToRoman(arabicNumeral int) (string, error) {
-	if arabicNumeral <= 0 {
-		return "", fmt.Errorf("Ошибка: Римское число не может быть меньше или равно нулю")
-	}
-
+	
 	romanNumerals := []struct {
 		Value  int
 		Symbol string
 	}{
-		{1000, "M"},
-		{900, "CM"},
-		{500, "D"},
-		{400, "CD"},
 		{100, "C"},
 		{90, "XC"},
 		{50, "L"},
@@ -82,15 +86,21 @@ func arabicToRoman(arabicNumeral int) (string, error) {
 	return result, nil
 }
 
+// Проверка принадлежности к римским цифрам.
+func isRomanNumeral(numeral string) bool {
+	_, ok := romanNumerals[numeral]
+	return ok
+}
+
 func main() {
 	var operand1Str string
 	var operand2Str string
 	var operator string
-	fmt.Print("Введите выражение: ")
+	fmt.Print("Введите выражение,например 5 + 5:  ")
 	fmt.Scanln(&operand1Str, &operator, &operand2Str)
 
 	if operand1Str == "" || operator == "" || operand2Str == "" {
-		fmt.Println("Ошибка: Неверный формат выражения 2 ")
+		fmt.Println("Ошибка: Неверный формат выражения ")
 		return
 	}
 
@@ -114,12 +124,19 @@ func main() {
 		}
 	}
 
-	// Проверка вводимых арабских цифр на принодлежность промежутку от 1 до 10
-	/// if (operand1 > 10 || operand1 < 1) || (operand2 > 10 || operand2 < 1) {
+	if (isRomanNumeral(operand1Str) && ! isRomanNumeral(operand2Str)) || (! isRomanNumeral(operand1Str) && isRomanNumeral(operand2Str)) {
 
-	//	fmt.Println("Erorr")
-	//	return
-	//}
+		fmt.Print("Eroor: используются одновременно разные системы счисления.")
+		return
+	}
+
+	// Проверка вводимых цифр на принодлежность промежутку от 1 до 10
+	if (operand1 > 10 || operand1 < 1) || (operand2 > 10 || operand2 < 1) {
+
+		fmt.Println("Ошибка: вы ввели числа не попадющие в промежуток из условия, " + 
+		"указывайте числа в промежутке [1:10].")
+		return
+	}
 
 	// Выполнение операции в зависимости от оператора
 	var result int
@@ -137,9 +154,13 @@ func main() {
 		return
 	}
 
-	// Вывод результата
-	fmt.Println("Результат:", result)
 
+	if ! isRomanNumeral(operand1Str) && ! isRomanNumeral(operand2Str) {
+	
+	// Вывод результата
+	fmt.Println("Результат: (арабские цифры)", result)
+	return
+	}
 	// Преобразование результата в римское число, если операнды были римскими числами
 	romanResult, err := arabicToRoman(result)
 	if err == nil {
