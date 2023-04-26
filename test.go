@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"strconv"
+	"strings"
 )
 
 var romanNumerals = map[string]int{
@@ -93,16 +96,32 @@ func isRomanNumeral(numeral string) bool {
 }
 
 func main() {
-	var operand1Str string
-	var operand2Str string
-	var operator string
-	fmt.Print("Введите выражение,например 5 + 5:  ")
-	fmt.Scanln(&operand1Str, &operator, &operand2Str)
 
-	if operand1Str == "" || operator == "" || operand2Str == "" {
-		fmt.Println("Ошибка: Неверный формат выражения ")
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("Введите выражение, пример 1 + 1 или I + I: ")
+	text, _ := reader.ReadString('\n')
+	text = strings.TrimSpace(text)
+
+	
+
+	op1_op_op2 := strings.Split(text, " ")
+
+	if len(op1_op_op2) != 3 {
+
+		fmt.Print("Error: Вы вели неверный формат выражения.")
 		return
 	}
+
+	operand1Str := op1_op_op2[0]
+	operator := op1_op_op2[1]
+	operand2Str := op1_op_op2[2]
+
+
+	if operand1Str == ""|| operator == "" || operand2Str == ""{
+		fmt.Print("Error")
+		return
+	}
+
 
 	operand1, err := strconv.Atoi(operand1Str)
 	if err != nil {
@@ -124,17 +143,18 @@ func main() {
 		}
 	}
 
-	if (isRomanNumeral(operand1Str) && ! isRomanNumeral(operand2Str)) || (! isRomanNumeral(operand1Str) && isRomanNumeral(operand2Str)) {
-
-		fmt.Print("Eroor: используются одновременно разные системы счисления.")
-		return
-	}
 
 	// Проверка вводимых цифр на принодлежность промежутку от 1 до 10
 	if (operand1 > 10 || operand1 < 1) || (operand2 > 10 || operand2 < 1) {
 
 		fmt.Println("Ошибка: вы ввели числа не попадющие в промежуток из условия, " + 
 		"указывайте числа в промежутке [1:10].")
+		return
+	}
+
+	if (isRomanNumeral(operand1Str) && ! isRomanNumeral(operand2Str)) || (! isRomanNumeral(operand1Str) && isRomanNumeral(operand2Str)) {
+
+		fmt.Print("Error: используются одновременно разные системы счисления.")
 		return
 	}
 
@@ -161,9 +181,16 @@ func main() {
 	fmt.Println("Результат: (арабские цифры)", result)
 	return
 	}
+	if  isRomanNumeral(operand1Str) &&  isRomanNumeral(operand2Str) {
+		if result < 1 {
+
+			fmt.Print("Ошибка: Результат для римских чисел не может быть отрицательным или равен нулю.")
+			return
+		}
 	// Преобразование результата в римское число, если операнды были римскими числами
 	romanResult, err := arabicToRoman(result)
 	if err == nil {
 		fmt.Println("Результат (римские цифры):", romanResult)
+	}
 	}
 }
